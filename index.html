@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Үндэсний бөхийн таамаглагч | Novelsoft</title>
+<style>
+  :root{
+    --red:#A4262C; --deep:#6E1B1E; --gold:#D4A02A; --gold2:#F0C860;
+    --cream:#FBF5E8; --card:#FFFDF7; --blue:#2C7FB8; --ink:#2C231C; --muted:#8a7a63;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Calibri,sans-serif;color:var(--ink);
+    background:var(--cream);
+    background-image:radial-gradient(circle at 12% 18%, rgba(212,160,42,.07), transparent 42%),
+                     radial-gradient(circle at 88% 12%, rgba(164,38,44,.06), transparent 40%);}
+  /* хээ угалз хүрээ */
+  .meander{height:12px;background:
+    repeating-linear-gradient(90deg, var(--gold) 0 8px, transparent 8px 12px, var(--gold) 12px 16px, transparent 16px 28px);
+    opacity:.9}
+  header{background:linear-gradient(135deg,var(--deep),var(--red));color:#fff;padding:22px 24px 18px;position:relative}
+  header h1{margin:0;font-size:23px;letter-spacing:.3px;display:flex;align-items:center;gap:10px}
+  header p{margin:6px 0 0;font-size:13px;color:#f3d9b6}
+  .tabs{display:flex;gap:6px;max-width:1120px;margin:14px auto 0;padding:0 16px;flex-wrap:wrap}
+  .tab{padding:11px 20px;border-radius:12px 12px 0 0;background:#efe2c6;cursor:pointer;font-weight:700;font-size:15px;color:#8a6d3b;border:1px solid transparent;border-bottom:none}
+  .tab.on{background:var(--card);color:var(--red);border-color:var(--gold)}
+  .wrap{max-width:1120px;margin:0 auto 28px;padding:16px}
+  .card{background:var(--card);border:1px solid #ecdcbc;border-radius:14px;box-shadow:0 3px 16px rgba(110,27,30,.07);padding:22px;margin-bottom:20px}
+  h3.sec{margin:0 0 10px;color:var(--deep);font-size:17px;border-bottom:2px solid var(--gold);padding-bottom:6px;display:inline-block}
+  .pickers{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start}
+  .vs{align-self:center;font-weight:800;color:var(--red);font-size:22px}
+  label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--deep)}
+  input[type=text]{width:100%;padding:11px 12px;border:1.5px solid #e0cfa8;border-radius:9px;font-size:15px;background:#fffdf7}
+  input:focus{outline:none;border-color:var(--gold)}
+  .list{border:1px solid #e6d6b4;border-radius:9px;margin-top:5px;max-height:230px;overflow:auto;display:none;position:absolute;z-index:20;background:#fff;width:100%;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .list.show{display:block}
+  .opt{padding:9px 12px;cursor:pointer;font-size:14px;border-bottom:1px solid #f4ecd9}
+  .opt:hover{background:#fbf2dd}.opt small{color:var(--muted)}
+  .pk{position:relative}
+  button.go{margin-top:16px;padding:13px 22px;background:linear-gradient(135deg,var(--red),var(--deep));color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 3px 10px rgba(164,38,44,.25)}
+  button.go:disabled{background:#cbb9b0;cursor:not-allowed;box-shadow:none}
+  button.go.full{width:100%}
+  button.ghost{background:#efe2c6;color:var(--deep);border:1px solid var(--gold);border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer}
+  .result{display:none}.result.show{display:block}
+  .bar{display:flex;height:48px;border-radius:10px;overflow:hidden;margin:14px 0;font-weight:800;color:#fff}
+  .bar .a{background:linear-gradient(135deg,var(--blue),#4a9fd0);display:flex;align-items:center;padding-left:12px}
+  .bar .b{background:linear-gradient(135deg,var(--red),var(--deep));display:flex;align-items:center;justify-content:flex-end;padding-right:12px}
+  .names{display:flex;justify-content:space-between;font-weight:800;font-size:15px}.names .rname{color:var(--red)}
+  .win{text-align:center;font-size:18px;margin:6px 0 2px}.win b{color:var(--red)}
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+  th,td{padding:8px 10px;text-align:center;border-bottom:1px solid #f0e7d3}
+  th{color:var(--muted);font-weight:700}td.lab{color:var(--muted);font-weight:700}
+  .metrics{font-size:12.5px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}.metrics b{color:var(--deep)}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+  /* bracket */
+  .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+  select{padding:9px 12px;border:1.5px solid #e0cfa8;border-radius:9px;font-size:14px;background:#fffdf7}
+  .seats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px;margin-top:8px}
+  .seat{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:8px}
+  .seat .num{width:26px;height:26px;border-radius:50%;background:var(--deep);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .odds{display:grid;gap:6px;margin-top:6px}
+  .orow{display:grid;grid-template-columns:26px 1fr 60px;align-items:center;gap:8px;font-size:14px}
+  .orow .oname{position:relative;background:#f3ead6;border-radius:5px;overflow:hidden;cursor:pointer}
+  .orow .oname span{position:absolute;left:8px;top:0;line-height:24px;font-weight:600;white-space:nowrap}
+  .orow .oname .fill{height:24px}
+  .tree{display:flex;gap:14px;overflow-x:auto;padding:8px 2px}
+  .col{display:flex;flex-direction:column;justify-content:space-around;min-width:176px}
+  .col h4{margin:0 0 6px;font-size:12px;color:var(--deep);text-align:center;letter-spacing:.5px;font-weight:800}
+  .mb{background:#fffdf7;border:1px solid #ecdcbc;border-radius:8px;margin:6px 0;overflow:hidden}
+  .mb .p{display:flex;justify-content:space-between;padding:7px 9px;font-size:13px;border-bottom:1px solid #f2e9d5;cursor:pointer}
+  .mb .p:last-child{border-bottom:none}
+  .mb .p.w{background:#fbf1d6;font-weight:800;color:var(--deep)}
+  .mb .p.l{color:#b6a898}
+  .mb .p .pr{color:var(--red);font-size:12px}
+  .champ{align-self:center;text-align:center;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:12px;padding:16px 18px;font-weight:800;color:#5a3d0c;min-width:150px;box-shadow:0 4px 14px rgba(212,160,42,.35)}
+  .champ .t{font-size:30px}
+  /* profile */
+  .prof{display:grid;grid-template-columns:190px 1fr;gap:20px}
+  .pphoto{width:190px;height:230px;object-fit:cover;border-radius:12px;border:3px solid var(--gold);background:#eee}
+  .pstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:6px}
+  .stat{background:#fbf2dd;border-radius:9px;padding:10px 12px}
+  .stat .v{font-size:19px;font-weight:800;color:var(--deep)}.stat .k{font-size:11px;color:var(--muted)}
+  .hwin{color:#1c7a3a;font-weight:700}.hloss{color:var(--red);font-weight:700}
+  .clk{color:var(--blue);cursor:pointer}
+  .small{font-size:13px}.muted{color:var(--muted)}
+  /* game */
+  .gmatch{display:grid;grid-template-columns:1fr 34px 1fr;align-items:stretch;gap:8px;margin:8px 0}
+  .gpick{border:2px solid #e6d6b4;border-radius:10px;padding:10px 12px;cursor:pointer;background:#fffdf7;transition:.12s;text-align:center}
+  .gpick:hover{border-color:var(--gold)}
+  .gpick.sel{border-color:var(--red);background:#fbf1d6;font-weight:800;box-shadow:0 2px 8px rgba(164,38,44,.15)}
+  .gpick .gn{font-weight:700;font-size:14px}.gpick .ge{font-size:12px;color:var(--muted)}
+  .gvs{align-self:center;text-align:center;color:var(--muted);font-weight:800}
+  .sb{width:100%;border-collapse:collapse;margin-top:8px}
+  .sb th,.sb td{padding:8px;border-bottom:1px solid #f0e7d3;text-align:center}
+  .vsbanner{text-align:center;font-size:22px;font-weight:800;margin:6px 0}
+  @media(max-width:640px){.pickers{grid-template-columns:1fr}.seats{grid-template-columns:1fr}.prof{grid-template-columns:1fr}.pphoto{width:100%;height:280px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🤼 Үндэсний бөхийн таамаглагч 🏇</h1>
+  <p>Elo + TrueSkill + машин сургалт · 240,000 барилдааны түүхэн дата дээр суурилсан</p>
+</header>
+<div class="meander"></div>
+
+<div class="tabs">
+  <div class="tab on" data-t="one">Хоёр бөхийн барилдаан</div>
+  <div class="tab" data-t="brk">Наадам · Тор (Bracket)</div>
+  <div class="tab" data-t="game">🎯 Таамаглалын тоглоом</div>
+  <div class="tab" data-t="pro">Бөхийн мэдээлэл</div>
+</div>
+
+<div class="wrap">
+  <!-- ============ 1) 1v1 ============ -->
+  <div id="pane-one">
+    <div class="card">
+      <div class="pickers">
+        <div class="pk"><label>1-р бөх</label><input type="text" id="s1" placeholder="Нэрээр хайх..." autocomplete="off"><div class="list" id="l1"></div><div id="c1" style="margin-top:8px;font-size:13px;color:var(--muted)"></div></div>
+        <div class="vs">⚔</div>
+        <div class="pk"><label>2-р бөх</label><input type="text" id="s2" placeholder="Нэрээр хайх..." autocomplete="off"><div class="list" id="l2"></div><div id="c2" style="margin-top:8px;font-size:13px;color:var(--muted)"></div></div>
+      </div>
+      <button class="go full" id="go" disabled>Таамаглах</button>
+    </div>
+    <div class="card result" id="res">
+      <div class="win" id="winline"></div>
+      <div class="names"><span id="na"></span><span class="rname" id="nb"></span></div>
+      <div class="bar"><div class="a" id="ba"></div><div class="b" id="bb"></div></div>
+      <table id="cmp"></table>
+      <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:14px" id="h2hline"></p>
+    </div>
+    <div class="card"><div class="metrics" id="mx"></div></div>
+  </div>
+
+  <!-- ============ 2) BRACKET ============ -->
+  <div id="pane-brk" style="display:none">
+    <div class="card">
+      <h3 class="sec">Наадмын тор байгуулах</h3>
+      <div class="controls" style="margin-top:10px">
+        <label style="margin:0">Бөхийн тоо:</label>
+        <select id="bsize"><option value="16">16</option><option value="32">32</option><option value="8">8</option><option value="4">4</option></select>
+        <button class="ghost" id="bfill">⚡ Elo-гоор автоматаар дүүргэх</button>
+        <button class="ghost" id="bclear">Цэвэрлэх</button>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin:8px 0 0">Бөхчүүдээ гараар оруулна (эсвэл автоматаар дүүргэнэ). Зэрэгцээ нүд (1-2, 3-4 ...) эхний шатанд тулна. Үлдсэн 8→4→2→1-ийг загвар тооцно.</p>
+      <div class="seats" id="seats"></div>
+      <button class="go full" id="brun" disabled style="margin-top:16px">🏆 Тор гаргаж аваргыг таамаглах</button>
+    </div>
+    <div class="card result" id="bres">
+      <div class="win" id="bchamp"></div>
+      <h3 class="sec" style="margin-top:14px">Аварга болох магадлал (Monte Carlo)</h3>
+      <div class="odds" id="bodds"></div>
+      <h3 class="sec" style="margin-top:20px">Хамгийн магадлалт тор</h3>
+      <div class="tree" id="btree"></div>
+    </div>
+  </div>
+
+  <!-- ============ 3) PROFILE ============ -->
+  <div id="pane-pro" style="display:none">
+    <div class="card">
+      <h3 class="sec">Бөх хайх</h3>
+      <div class="pk" style="max-width:420px;margin-top:10px"><input type="text" id="sp" placeholder="Бөхийн нэр... (ж: Орхонбаяр)" autocomplete="off"><div class="list" id="lp"></div></div>
+    </div>
+    <div class="card result" id="pres">
+      <div class="prof">
+        <div><img id="pimg" class="pphoto" alt="зураг"></div>
+        <div>
+          <h2 id="pname" style="margin:0 0 2px;color:var(--deep)"></h2>
+          <div id="ptitle" style="color:var(--red);font-weight:700"></div>
+          <div class="pstats" id="pstats"></div>
+        </div>
+      </div>
+      <h3 class="sec" style="margin-top:20px">Барилдааны түүх <small id="ptot" style="color:var(--muted);font-weight:400"></small></h3>
+      <div style="max-height:460px;overflow:auto">
+        <table id="phist"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 4) PREDICTION GAME ============ -->
+  <div id="pane-game" style="display:none">
+    <div class="card">
+      <h3 class="sec">🎯 Таамаглалын тоглоом — AI-г дав!</h3>
+      <div class="controls" style="margin-top:10px">
+        <label style="margin:0">Бөхийн тоо:</label>
+        <select id="gsize"><option value="32">32 (1/16-аас)</option><option value="16">16 (1/8-аас)</option></select>
+        <button class="ghost" id="gnew">🎲 Шинэ тоглоом эхлүүлэх</button>
+      </div>
+      <p class="muted small" style="margin:8px 0 0">Даваа бүрт шалгарах бөхөө дар. Дараагийн даваанд сонгосон нь л үлдэнэ. Аварга хүртэл зөв таасан тусам оноо нэмэгдэж, сүүлийн даваанууд хамгийн өндөр оноотой. Эцэст нь санамсаргүй "жинхэнэ" үр дүн гарч, AI-тай оноогоо харьцуулна.</p>
+    </div>
+    <div class="card" id="gplay" style="display:none">
+      <div id="groundname" style="font-weight:800;color:var(--deep);font-size:17px"></div>
+      <div id="gprog" class="muted small" style="margin:2px 0 10px"></div>
+      <div id="gmatches"></div>
+      <button class="go full" id="gnext" disabled style="margin-top:14px">Дараагийн даваа →</button>
+    </div>
+    <div class="card result" id="gscore"></div>
+  </div>
+</div>
+<div class="meander"></div>
+<footer>Novelsoft LLC · Elo + TrueSkill + HistGradientBoosting · Зөвхөн танин мэдэхүйн зорилготой</footer>
+
+<script>
+// ---------- tabs ----------
+const panes={one:'pane-one',brk:'pane-brk',game:'pane-game',pro:'pane-pro'};
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+  for(const k in panes) document.getElementById(panes[k]).style.display = (k===t.dataset.t)?'block':'none';
+  if(t.dataset.t==='brk' && !seatsBuilt) buildSeats();
+});
+
+// ---------- reusable search ----------
+function attachSearch(input, list, onPick, active){
+  async function run(){
+    const q=input.value.trim();
+    const r=await fetch('/api/players?q='+encodeURIComponent(q)+'&limit=30'+(active?'&active=1':''));
+    const data=await r.json(); list.innerHTML='';
+    data.forEach(p=>{
+      const div=document.createElement('div'); div.className='opt';
+      const wr=p.winrate!=null?Math.round(p.winrate*100)+'%':'—';
+      div.innerHTML=`${p.name} <small>· ${p.title_name||''} · Elo ${Math.round(p.elo)} · ${p.matches} барилдаан · ${wr}</small>`;
+      div.onmousedown=(e)=>{e.preventDefault(); onPick(p); list.classList.remove('show');};
+      list.appendChild(div);
+    });
+    list.classList.add('show');
+  }
+  let tm; input.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(run,170)});
+  input.addEventListener('focus',run);
+  input.addEventListener('blur',()=>setTimeout(()=>list.classList.remove('show'),150));
+}
+function pct(x){return x!=null?Math.round(x*100)+'%':'—';}
+function streak(s){if(s==null)return'—';return s>0?('🔵 '+s):(s<0?('🔴 '+(-s)):'—');}
+
+// ---------- 1v1 ----------
+const sel={1:null,2:null};
+function set1v1(n,p){sel[n]=p;document.getElementById('s'+n).value=p.name;
+  document.getElementById('c'+n).innerHTML=`Elo ${Math.round(p.elo)} · ${p.title_name||''} · ${p.matches} барилдаан`;
+  document.getElementById('go').disabled=!(sel[1]&&sel[2]);}
+attachSearch(document.getElementById('s1'),document.getElementById('l1'),p=>set1v1(1,p));
+attachSearch(document.getElementById('s2'),document.getElementById('l2'),p=>set1v1(2,p));
+document.getElementById('go').onclick=async()=>{
+  const r=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({w1:sel[1].id,w2:sel[2].id})});
+  if(!r.ok){alert('Алдаа: '+(await r.json()).detail);return;}
+  const d=await r.json(); const pa=Math.round(d.a.prob*100),pb=100-pa;
+  document.getElementById('na').textContent=d.a.name;document.getElementById('nb').textContent=d.b.name;
+  document.getElementById('ba').textContent=pa+'%';document.getElementById('bb').textContent=pb+'%';
+  document.getElementById('ba').style.width=pa+'%';document.getElementById('bb').style.width=pb+'%';
+  document.getElementById('winline').innerHTML=`Магадлалт ялагч: <b>${d.winner_name}</b> (итгэл ${Math.round(d.confidence*100)}%)`;
+  const rows=[['Elo рейтинг',Math.round(d.a.elo),Math.round(d.b.elo)],['Оргил Elo',Math.round(d.a.peak_elo),Math.round(d.b.peak_elo)],
+    ['Цол',d.a.title_name||'—',d.b.title_name||'—'],['Сүүлийн форм',pct(d.a.form),pct(d.b.form)],
+    ['Цуврал',streak(d.a.streak),streak(d.b.streak)],['Ялалтын хувь',pct(d.a.winrate),pct(d.b.winrate)],
+    ['Нийт барилдаан',d.a.matches,d.b.matches],['Нас',d.a.age??'—',d.b.age??'—'],
+    ['Жин',d.a.weight??'—',d.b.weight??'—'],['Өндөр',d.a.height??'—',d.b.height??'—']];
+  let html=`<tr><th>${d.a.name}</th><th>Үзүүлэлт</th><th>${d.b.name}</th></tr>`;
+  rows.forEach(([l,a,b])=>html+=`<tr><td>${a}</td><td class="lab">${l}</td><td>${b}</td></tr>`);
+  document.getElementById('cmp').innerHTML=html;
+  const h=d.h2h;
+  document.getElementById('h2hline').textContent=(h.a+h.b>0)?`Хоорондын түүх: ${d.a.name} ${h.a} - ${h.b} ${d.b.name}`:'Хоорондоо урьд өмнө барилдаж байгаагүй';
+  document.getElementById('res').classList.add('show');
+};
+fetch('/api/metrics').then(r=>r.json()).then(m=>{document.getElementById('mx').innerHTML=
+  `<span>Нарийвчлал: <b>${(m.accuracy*100).toFixed(1)}%</b></span><span>ROC-AUC: <b>${m.auc}</b></span>`+
+  `<span>Загвар: <b>${m.model}</b> (Elo K=${m.bestK})</span><span>Барилдаан: <b>${m.n_matches.toLocaleString()}</b></span>`;});
+
+// ---------- bracket ----------
+let seatsBuilt=false; let seats=[];
+function buildSeats(){
+  const n=+document.getElementById('bsize').value;
+  seats=new Array(n).fill(null);
+  const box=document.getElementById('seats'); box.innerHTML='';
+  for(let i=0;i<n;i++){
+    const row=document.createElement('div'); row.className='seat';
+    row.innerHTML=`<div class="num">${i+1}</div><div class="pk"><input type="text" id="seat${i}" placeholder="${i+1}-р бөх..." autocomplete="off"><div class="list" id="seatl${i}"></div></div>`;
+    box.appendChild(row);
+  }
+  for(let i=0;i<n;i++){
+    attachSearch(document.getElementById('seat'+i),document.getElementById('seatl'+i),p=>{seats[i]=p;document.getElementById('seat'+i).value=p.name;checkSeats();},true);
+  }
+  seatsBuilt=true; checkSeats();
+}
+function checkSeats(){
+  const filled=seats.filter(Boolean).length;
+  const ids=seats.filter(Boolean).map(p=>p.id);
+  const uniq=new Set(ids).size===ids.length;
+  document.getElementById('brun').disabled=!(filled===seats.length && uniq);
+}
+document.getElementById('bsize').onchange=()=>{seatsBuilt=false;buildSeats();};
+document.getElementById('bclear').onclick=()=>{seatsBuilt=false;buildSeats();document.getElementById('bres').classList.remove('show');};
+document.getElementById('bfill').onclick=async()=>{
+  const n=+document.getElementById('bsize').value;
+  const r=await fetch('/api/topseeds?n='+n); const top=await r.json();
+  top.forEach((p,i)=>{if(i<seats.length){seats[i]=p;document.getElementById('seat'+i).value=p.name;}});
+  checkSeats();
+};
+document.getElementById('brun').onclick=async()=>{
+  const btn=document.getElementById('brun');btn.disabled=true;btn.textContent='Симуляцалж байна...';
+  try{
+    const ids=seats.map(p=>p.id);
+    const r=await fetch('/api/bracket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids,sims:20000})});
+    if(!r.ok){alert('Алдаа: '+(await r.json()).detail);}else{renderBracket(await r.json());}
+  }catch(e){alert('Алдаа: '+e);}
+  btn.textContent='🏆 Тор гаргаж аваргыг таамаглах';checkSeats();
+};
+function renderBracket(d){
+  document.getElementById('bchamp').innerHTML=`🏆 Хамгийн магадлалт аварга: <b>${d.champion.name}</b> <small style="color:var(--muted)">(Elo ${Math.round(d.champion.elo)})</small>`;
+  const max=Math.max(...d.odds.map(o=>o.champion))||1;
+  document.getElementById('bodds').innerHTML=d.odds.map((o,i)=>{
+    const w=Math.max(2,Math.round(o.champion/max*100));
+    return `<div class="orow"><div style="color:var(--muted)">${i+1}</div>`+
+      `<div class="oname" onclick="openProfile('${o.id}')"><div class="fill" style="width:${w}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div><span>${o.name} · Elo ${Math.round(o.elo)}</span></div>`+
+      `<div style="text-align:right;font-weight:800">${(o.champion*100).toFixed(1)}%</div></div>`;
+  }).join('');
+  document.getElementById('btree').innerHTML=d.rounds.map(rd=>{
+    const boxes=rd.matchups.map(mt=>{const aw=mt.winner===mt.a.id;const pa=Math.round(mt.pa*100);
+      return `<div class="mb"><div class="p ${aw?'w':'l'}" onclick="openProfile('${mt.a.id}')"><span>${mt.a.name}</span><span class="pr">${pa}%</span></div>`+
+        `<div class="p ${aw?'l':'w'}" onclick="openProfile('${mt.b.id}')"><span>${mt.b.name}</span><span class="pr">${100-pa}%</span></div></div>`;
+    }).join('');
+    return `<div class="col"><h4>${rd.name}</h4>${boxes}</div>`;
+  }).join('')+`<div class="col" style="justify-content:center"><h4>Аварга</h4><div class="champ"><div class="t">🏆</div>${d.champion.name}</div></div>`;
+  document.getElementById('bres').classList.add('show');
+}
+
+// ---------- profile ----------
+attachSearch(document.getElementById('sp'),document.getElementById('lp'),p=>openProfile(p.id));
+function openProfile(id){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelector('.tab[data-t="pro"]').classList.add('on');
+  for(const k in panes) document.getElementById(panes[k]).style.display=(k==='pro')?'block':'none';
+  fetch('/api/profile/'+id).then(r=>r.json()).then(d=>{
+    const p=d.player;
+    document.getElementById('pimg').src='/api/photo/'+id;
+    document.getElementById('pname').textContent=p.name;
+    document.getElementById('ptitle').textContent=(p.title_name||'')+(p.elo_rank?` · Elo зэрэглэл #${p.elo_rank}`:'');
+    const st=[['Elo',Math.round(p.elo)],['Оргил Elo',Math.round(p.peak_elo)],['Нийт барилдаан',p.matches],
+      ['Ялалт',p.wins],['Ялалтын хувь',pct(p.winrate)],['Сүүлийн форм',pct(p.form)],['Цуврал',streak(p.streak)],
+      ['Нас',p.age??'—'],['Жин',p.weight?p.weight+' кг':'—'],['Өндөр',p.height?p.height+' см':'—'],
+      ['Сүүл 12сар',p.activity365+' барилдаан']];
+    document.getElementById('pstats').innerHTML=st.map(([k,v])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+    document.getElementById('ptot').textContent=`(нийт ${d.total}, сүүлийн ${d.history.length})`;
+    let h=`<tr><th>Огноо</th><th>Наадам</th><th>Өрсөлдөгч</th><th>Дүн</th></tr>`;
+    d.history.forEach(e=>{h+=`<tr><td>${e.date}</td><td style="text-align:left">${e.tournament||'—'}</td>`+
+      `<td class="clk" onclick="openProfile('${e.opp_id}')">${e.opp}</td>`+
+      `<td>${e.win?'<span class="hwin">Ялсан</span>':'<span class="hloss">Хожигдсон</span>'}</td></tr>`;});
+    document.getElementById('phist').innerHTML=h;
+    document.getElementById('pres').classList.add('show');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+}
+
+// ---------- prediction game ----------
+const GW={16:1,8:2,4:4,2:7,1:12};
+function roundName(cnt){return {32:'1/16 финал',16:'1/8 финал',8:'1/4 финал',4:'Хагас финал (1/2)',2:'Финал'}[cnt]||('1/'+cnt);}
+let G=null;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+document.getElementById('gnew').onclick=gStart;
+async function gStart(){
+  const size=+document.getElementById('gsize').value;
+  const btn=document.getElementById('gnew'); btn.textContent='Ачаалж байна...';
+  const r=await fetch('/api/game/new',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({size})});
+  const d=await r.json(); btn.textContent='🎲 Шинэ тоглоом эхлүүлэх';
+  G={field:d.field,P:d.P,size:d.size,seed:(Date.now()>>>0)||7,round:0,surv:[...Array(d.size).keys()],userAdv:[],pick:{}};
+  document.getElementById('gscore').classList.remove('show');
+  document.getElementById('gplay').style.display='block';
+  renderRound();
+}
+function renderRound(){
+  G.pick={}; const S=G.surv, cnt=S.length;
+  document.getElementById('groundname').textContent=roundName(cnt)+' — шалгарах '+(cnt/2)+' бөхөө сонго';
+  document.getElementById('gprog').textContent='Даваа '+(G.round+1)+' / '+Math.log2(G.size);
+  let html='';
+  for(let k=0;k<S.length;k+=2){const i=S[k],j=S[k+1],mi=k/2;
+    html+=`<div class="gmatch">`+
+      `<div class="gpick" id="gp${mi}a" onclick="gPick(${mi},${i})"><div class="gn">${G.field[i].name}</div><div class="ge">Elo ${Math.round(G.field[i].elo)}</div></div>`+
+      `<div class="gvs">VS</div>`+
+      `<div class="gpick" id="gp${mi}b" onclick="gPick(${mi},${j})"><div class="gn">${G.field[j].name}</div><div class="ge">Elo ${Math.round(G.field[j].elo)}</div></div></div>`;}
+  document.getElementById('gmatches').innerHTML=html;
+  const nb=document.getElementById('gnext'); nb.disabled=true;
+  nb.textContent=(cnt===2?'🏆 Аваргаа сонгож дуусгах':'Дараагийн даваа →');
+}
+function gPick(mi,idx){
+  G.pick[mi]=idx; const i=G.surv[mi*2], j=G.surv[mi*2+1];
+  document.getElementById('gp'+mi+'a').classList.toggle('sel',idx===i);
+  document.getElementById('gp'+mi+'b').classList.toggle('sel',idx===j);
+  document.getElementById('gnext').disabled=Object.keys(G.pick).length<G.surv.length/2;
+}
+document.getElementById('gnext').onclick=()=>{
+  const need=G.surv.length/2, adv=[];
+  for(let k=0;k<need;k++) adv.push(G.pick[k]);
+  G.userAdv.push(adv); G.surv=adv; G.round++;
+  if(adv.length===1) gFinish(); else renderRound();
+};
+function playAI(){let s=[...Array(G.size).keys()],adv=[];
+  while(s.length>1){const nx=[];for(let k=0;k<s.length;k+=2){const i=s[k],j=s[k+1];nx.push(G.P[i][j]>=0.5?i:j);}adv.push(nx);s=nx;}return adv;}
+function playActual(){const rnd=mulberry32(G.seed);let s=[...Array(G.size).keys()],adv=[];
+  while(s.length>1){const nx=[];for(let k=0;k<s.length;k+=2){const i=s[k],j=s[k+1];nx.push(rnd()<G.P[i][j]?i:j);}adv.push(nx);s=nx;}return adv;}
+function gFinish(){
+  const ai=playAI(), act=playActual(), user=G.userAdv;
+  let us=0,as=0,ms=0; const rows=[];
+  for(let r=0;r<act.length;r++){
+    const ca=act[r].length, w=GW[ca]||1;
+    const uc=user[r].filter(x=>act[r].includes(x)).length;
+    const ac=ai[r].filter(x=>act[r].includes(x)).length;
+    us+=w*uc; as+=w*ac; ms+=w*ca;
+    rows.push(`<tr><td>${roundName(ca*2)}</td><td>${uc}/${ca} <span class="muted">(×${w})</span></td><td><b>${uc*w}</b></td><td>${ac*w}</td></tr>`);
+  }
+  const actChamp=G.field[act[act.length-1][0]].name;
+  const userChamp=G.field[user[user.length-1][0]].name;
+  const aiChamp=G.field[ai[ai.length-1][0]].name;
+  const banner= us>as?'🎉 Та AI-г дав!':(us<as?'🤖 AI яллаа':'🤝 Тэнцлээ');
+  document.getElementById('gscore').innerHTML=
+    `<div class="vsbanner">Та <span style="color:var(--blue)">${us}</span> : <span style="color:var(--red)">${as}</span> AI</div>`+
+    `<div style="text-align:center;font-weight:800;margin-bottom:8px">${banner} <span class="muted small">(боломжит дээд ${ms})</span></div>`+
+    `<p class="muted small" style="text-align:center">🏆 Жинхэнэ аварга (санамсаргүй симуляц): <b>${actChamp}</b><br>Таны таамаг: ${userChamp} · AI-ийн таамаг: ${aiChamp}</p>`+
+    `<table class="sb"><tr><th>Даваа</th><th>Таны зөв</th><th>Таны оноо</th><th>AI оноо</th></tr>${rows.join('')}`+
+    `<tr style="font-weight:800;background:#fbf2dd"><td>Нийт</td><td>—</td><td>${us}</td><td>${as}</td></tr></table>`+
+    `<button class="go full" style="margin-top:14px" onclick="gStart()">🎲 Дахин тоглох</button>`;
+  document.getElementById('gscore').classList.add('show');
+  document.getElementById('gplay').style.display='none';
+  window.scrollTo({top:document.getElementById('pane-game').offsetTop,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
