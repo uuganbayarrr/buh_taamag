@@ -2,7 +2,6 @@ aiohappyeyeballs==2.6.1
 aiohttp==3.13.5
 aiosignal==1.4.0
 altair==5.5.0
-altgraph @ file:///AppleInternal/Library/BuildRoots/4~CDlvugAeMYaHcTWIELyAQ2joHAecmlI0GAlKPsw/Library/Caches/com.apple.xbs/Sources/python3/altgraph-0.17.2-py2.py3-none-any.whl
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.12.1
@@ -42,7 +41,6 @@ fonttools==4.60.2
 fqdn==1.5.1
 frozenlist==1.8.0
 fsspec==2025.10.0
-future @ file:///AppleInternal/Library/BuildRoots/4~CDlvugAeMYaHcTWIELyAQ2joHAecmlI0GAlKPsw/Library/Caches/com.apple.xbs/Sources/python3/future-0.18.2-py3-none-any.whl
 gitdb==4.0.12
 GitPython==3.1.48
 google-auth==2.49.1
@@ -82,7 +80,6 @@ jupyterlab_widgets==3.0.16
 kiwisolver==1.4.7
 lark==1.3.1
 lightgbm==4.6.0
-macholib @ file:///AppleInternal/Library/BuildRoots/4~CDlvugAeMYaHcTWIELyAQ2joHAecmlI0GAlKPsw/Library/Caches/com.apple.xbs/Sources/python3/macholib-1.15.2-py2.py3-none-any.whl
 MarkupSafe==3.0.3
 matplotlib==3.9.4
 matplotlib-inline==0.2.2
@@ -149,7 +146,6 @@ safetensors==0.7.0
 scikit-learn==1.6.1
 scipy==1.13.1
 Send2Trash==2.1.0
-six @ file:///AppleInternal/Library/BuildRoots/4~CDlvugAeMYaHcTWIELyAQ2joHAecmlI0GAlKPsw/Library/Caches/com.apple.xbs/Sources/python3/six-1.15.0-py2.py3-none-any.whl
 smmap==5.0.3
 soupsieve==2.8.4
 stack-data==0.6.3
