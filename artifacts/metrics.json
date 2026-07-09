@@ -1,0 +1,18 @@
+{
+  "accuracy": 0.7668,
+  "auc": 0.8498,
+  "log_loss": 0.4845,
+  "accuracy_uncal": 0.7676,
+  "elo_only_acc": 0.7437,
+  "baseline_acc": 0.6373,
+  "bestK": 40,
+  "model": "HistGBM",
+  "n_test": 36076,
+  "n_matches": 240501,
+  "n_players": 6356,
+  "trained_at": "2026-07-03T02:11:14.759105",
+  "history": {
+    "v1": 0.737,
+    "v2": 0.76
+  }
+}
